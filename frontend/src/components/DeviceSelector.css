@@ -71,3 +71,22 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* No documents uploaded state */
+.device-selector-empty {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.875rem;
+}
+
+/* Required asterisk */
+.required {
+    color: #ef4444;
+    margin-left: 2px;
+}

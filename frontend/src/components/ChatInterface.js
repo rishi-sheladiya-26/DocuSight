@@ -124,7 +124,11 @@ const ChatInterface = ({ onLogout }) => {
                     <div className="empty-state fade-in">
                         <div className="empty-state-icon">📄</div>
                         <h2>How can I help you today?</h2>
-                        <p>Upload a document and ask me anything about it</p>
+                        {!deviceType ? (
+                            <p className="select-product-hint">👆 Select a <strong>Product Type</strong> above to start chatting</p>
+                        ) : (
+                            <p>Ask me anything about your <strong>{deviceType}</strong> document</p>
+                        )}
 
                         <div className="suggested-questions">
                             <p className="suggested-label">Try asking:</p>
@@ -151,20 +155,25 @@ const ChatInterface = ({ onLogout }) => {
             </div>
 
             <div className="chat-input-container glass-effect">
+                {!deviceType && (
+                    <div className="product-required-banner">
+                        ⚠️ Please select a <strong>Product Type</strong> above before chatting
+                    </div>
+                )}
                 <div className="chat-input-wrapper">
                     <textarea
                         className="chat-input"
-                        placeholder="Ask anything about your document..."
+                        placeholder={deviceType ? `Ask anything about your ${deviceType} document...` : 'Select a product type first...'}
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyPress={handleKeyPress}
                         rows={1}
-                        disabled={isLoading}
+                        disabled={isLoading || !deviceType}
                     />
                     <button
                         className="send-button"
                         onClick={() => handleSendMessage()}
-                        disabled={!inputValue.trim() || isLoading}
+                        disabled={!inputValue.trim() || isLoading || !deviceType}
                     >
                         {isLoading ? (
                             <Loader2 className="icon-spin" size={20} />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, AlertCircle } from 'lucide-react';
 import './DeviceSelector.css';
 import { devicesAPI } from '../services/api';
 
@@ -15,6 +15,7 @@ const DeviceSelector = ({
     const [availableBrands, setAvailableBrands] = useState([]);
     const [availableModels, setAvailableModels] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [noDocuments, setNoDocuments] = useState(false);
 
     useEffect(() => {
         loadDevices();
@@ -49,82 +50,44 @@ const DeviceSelector = ({
     const loadDevices = async () => {
         try {
             const response = await devicesAPI.listDevices();
-            setDevices(response.devices || []);
+            const deviceList = response.devices || [];
+            if (deviceList.length === 0) {
+                setNoDocuments(true);
+            }
+            setDevices(deviceList);
         } catch (error) {
             console.error('Error loading devices:', error);
-            // Use fallback device list with sample models
-            setDevices([
-                {
-                    device_type: 'Refrigerator',
-                    brands: ['Samsung', 'LG', 'Whirlpool', 'GE'],
-                    models: {
-                        'Samsung': ['RF28R7351SR', 'RF23M8070SR', 'RT18M6215SG', 'RB29FWRNDSA'],
-                        'LG': ['LRFLC2706S', 'LFXS26973S', 'LMXS30776S', 'LRFVC2406S'],
-                        'Whirlpool': ['WRF535SWHZ', 'WRS325SDHZ', 'WRT318FZDW', 'WRB322DMBM'],
-                        'GE': ['GNE27JSMSS', 'GYE22GYNFS', 'GTS18GTHWW', 'GIE18GTHBB']
-                    },
-                },
-                {
-                    device_type: 'Washing Machine',
-                    brands: ['Samsung', 'LG', 'Whirlpool', 'Bosch'],
-                    models: {
-                        'Samsung': ['WF45R6100AP', 'WF42H5000AW', 'WA50R5400AV', 'WF45K6500AV'],
-                        'LG': ['WM3900HWA', 'WM4000HWA', 'WT7300CW', 'WM9000HVA'],
-                        'Whirlpool': ['WFW5620HW', 'WTW5000DW', 'WFW9620HW', 'WTW8127LW'],
-                        'Bosch': ['WAT28400UC', 'WAW285H2UC', 'WAW285H1UC', 'WAT28401UC']
-                    },
-                },
-                {
-                    device_type: 'Air Conditioner',
-                    brands: ['Samsung', 'LG', 'Daikin', 'Carrier'],
-                    models: {
-                        'Samsung': ['AR12TXHQASINEU', 'AR09TXHQASINEU', 'AR18TSHQASINEU', 'AR24TXHQASINEU'],
-                        'LG': ['S4-W12JA3AA', 'S4-W18KLJWA', 'S3-M12JA3FA', 'S4-W24JA3AA'],
-                        'Daikin': ['FTKM50TV16U', 'FTKM35TV16U', 'FTKM25TV16U', 'FTKM60TV16U'],
-                        'Carrier': ['CAI12EK3R39F0', 'CAI18EK5R39F0', 'CAI24EK5R39F0', 'CAI12EK5R39F0']
-                    },
-                },
-                {
-                    device_type: 'TV',
-                    brands: ['Samsung', 'LG', 'Sony', 'TCL'],
-                    models: {
-                        'Samsung': ['QN90A', 'QN85A', 'AU8000', 'Q60A', 'The Frame'],
-                        'LG': ['C1 OLED', 'G1 OLED', 'A1 OLED', 'QNED90', 'NanoCell 90'],
-                        'Sony': ['A90J OLED', 'X95J', 'X90J', 'X85J', 'A80J OLED'],
-                        'TCL': ['6-Series R635', '5-Series S535', '4-Series S435', '6-Series R646']
-                    },
-                },
-                {
-                    device_type: 'Dishwasher',
-                    brands: ['Bosch', 'Whirlpool', 'Samsung', 'LG'],
-                    models: {
-                        'Bosch': ['SHPM88Z75N', 'SHEM63W55N', 'SHP865WD5N', 'SHPM78Z54N'],
-                        'Whirlpool': ['WDT750SAKZ', 'WDF520PADM', 'WDT730PAHZ', 'WDTA50SAKZ'],
-                        'Samsung': ['DW80R9950US', 'DW80R5061US', 'DW80K5050US', 'DW80R2031US'],
-                        'LG': ['LDP6797ST', 'LDT7808SS', 'LDF5545ST', 'LDTH7972S']
-                    },
-                },
-            ]);
+            setNoDocuments(true);
+            setDevices([]);
         } finally {
             setLoading(false);
         }
     };
 
     if (loading) {
-        return <div className="device-selector-loading">Loading devices...</div>;
+        return <div className="device-selector-loading">Loading products...</div>;
+    }
+
+    if (noDocuments) {
+        return (
+            <div className="device-selector-empty">
+                <AlertCircle size={16} />
+                <span>No documents uploaded yet. Upload a PDF first to start chatting.</span>
+            </div>
+        );
     }
 
     return (
         <div className="device-selector">
             <div className="selector-group">
-                <label htmlFor="device-type">Device Type</label>
+                <label htmlFor="device-type">Product Type <span className="required">*</span></label>
                 <div className="select-wrapper">
                     <select
                         id="device-type"
                         value={deviceType}
                         onChange={(e) => onDeviceTypeChange(e.target.value)}
                     >
-                        <option value="">Select device type...</option>
+                        <option value="">Select product type...</option>
                         {devices.map((device) => (
                             <option key={device.device_type} value={device.device_type}>
                                 {device.device_type}
@@ -136,7 +99,7 @@ const DeviceSelector = ({
             </div>
 
             <div className="selector-group">
-                <label htmlFor="brand">Brand (Optional)</label>
+                <label htmlFor="brand">Brand / Category</label>
                 <div className="select-wrapper">
                     <select
                         id="brand"
@@ -156,7 +119,7 @@ const DeviceSelector = ({
             </div>
 
             <div className="selector-group">
-                <label htmlFor="model">Model (Optional)</label>
+                <label htmlFor="model">Model / Version</label>
                 <div className="select-wrapper">
                     <select
                         id="model"
