@@ -25,7 +25,7 @@ function App() {
 
     if (isLoading) {
         return (
-            <div className="App loading-screen" role="status" aria-label="Loading DocuSight">
+            <div className="App loading-screen" role="status" aria-live="polite" aria-label="Loading DocuSight">
                 <div className="loader" aria-hidden="true"></div>
             </div>
         );
