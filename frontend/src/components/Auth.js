@@ -54,6 +54,7 @@ const Auth = ({ onLoginSuccess }) => {
                             placeholder="your@email.com"
                             required
                             disabled={isLoading}
+                            autoComplete={isLogin ? 'username' : 'email'}
                         />
                     </div>
 
@@ -68,6 +69,7 @@ const Auth = ({ onLoginSuccess }) => {
                             required
                             minLength={6}
                             disabled={isLoading}
+                            autoComplete={isLogin ? 'current-password' : 'new-password'}
                         />
                     </div>
 
